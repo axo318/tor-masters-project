@@ -1,0 +1,4 @@
+__pycache__/*
+bw_research/.ipynb_checkpoints/*
+bw_research/env/*
+bw_research/data/*
