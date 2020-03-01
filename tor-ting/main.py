@@ -6,6 +6,7 @@ from lib.debug import Debug
 # Vars
 fp_list = 'fingerprints.txt'
 ref_node = '99339F3E68BCCC1391BF14C821D80766FE0C5956'
+DAY_CYCLE = 1
 
 
 class Main(Debug):
@@ -28,7 +29,7 @@ class Main(Debug):
         fps = [line[:-1] for line in f]
 
         # Run
-        control = Control(args, fps, ref_node)
+        control = Control(args, fps, ref_node, day_cycle=DAY_CYCLE)
         control.run()
 
 

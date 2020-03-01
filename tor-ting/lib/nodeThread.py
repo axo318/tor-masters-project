@@ -10,13 +10,13 @@ class NodeThread(Debug):
         self.t = None
 
     def assignNode(self, node):
+        self.in_use = True
         self.t = threading.Thread(target=self.start, args=[])
         self.cur_node = node
-        self.in_use = True
         self.t.start()
 
     def start(self):
         self.show('Starting to measure Node:',str(self.cur_node.fp))
-        self.cur_node.execMeasurement()
+        self.cur_node.measure()
         self.show('Finished measuring Node:',str(self.cur_node.fp))
         self.in_use = False

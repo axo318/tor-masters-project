@@ -12,27 +12,38 @@ INPUTS:
 
 class Control(Debug):
 
-    def __init__(self, args, fps, ref_node):
+    def __init__(self, args, fps, ref_node, **kwargs):
         self.ref_node = ref_node
-        self.x_time = args[0]
         self.n_samples = int(args[1])
         self.t_threads = int(args[2])
         self.fps = fps
-        self.nodes = [Node(fp=fp, ref_node=ref_node) for fp in self.fps]
+        self.day_cycle = kwargs.get('day_cycle', 1) # Default one day cycle
+        self.nodes = self.initializeNodes()
         self.running = True
 
-    ##
+    ## Initializes nodes in priority queue
+    def initializeNodes(self):
+        # Calculate variables
+        x_time = (24*60) // (len(self.fps) // self.t_threads)     # Minutes per relay
+        relay_list = []
+
+        for i in range(self.day_cycle):
+            relay_list += self.fps
+
+        return [Node(fp=fp, ref_node=self.ref_node, x_time=x_time, cycle=self.day_cycle) for fp in relay_list]
+
+    ## Returns true if there are more nodes left to measure
     def nodes_left(self, nodes_list):
         return (len(nodes_list) > 0)
 
-    ##
+    ## Returns true if no thread is active
     def all_threads_available(self, ts):
         for t in ts:
             if t.in_use:
                 return False
         return True
 
-    ##
+    ## Main Loop
     def run(self):
         # Initialize threads
         self.show("Control is starting")
