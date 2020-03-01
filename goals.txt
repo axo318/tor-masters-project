@@ -1,0 +1,8 @@
+1) Select n nodes which best represent Tor   ----
+2) Set-up local public Tor nodes (forwaring) ----
+3) Write program which takes ips/fps, and measures their ping every #seconds
+	- Takes a list of fingerprints
+	- Takes input of samples per measurement -> affects time of measurement
+	- (Takes input n of threads)
+	- Takes input of duration for data collection for each node (x minutes)
+	- 
