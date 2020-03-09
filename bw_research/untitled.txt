@@ -1,0 +1,21 @@
+|---------------------|
+| Project Goals Notes |
+|---------------------|
+
+--> Measure each of the 20 chosen relays for 24 hours using one of the fastest ones as anchor (Switzerland)
+
+--> Research statistical tranformations to smooth out latency measurements. MovingAVG / ExponentialMovingAVG. Also correlate the variations of latencies to variations of anchor relay. Using this try and cancel out noise added by the measuring relay.
+
+--> Make a converter for tranforming latencies into tcp throughputs
+
+--> 
+
+--> Make SW which:
+    Takes a bandwidth/latency curve
+    Takes consensus bandwidth interval
+    ===
+    Measures variation from real-time values (Need to create a metric for this. Good starting point would be abolute integral for area between sampled and real values. )
+    
+--> Construct a model for consensus publishing network usage. This is used for evaluating interval times in terms of performance. Faster intervals will mean more intense network usage. This takes into account BW-measuring/Consensus-downloading. This involves research on how consensus is published, how much traffic measuring authorities generate, how many Tor users are online at any given point in time.
+
+--> 

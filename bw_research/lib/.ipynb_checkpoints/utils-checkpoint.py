@@ -8,6 +8,11 @@ bandwidth_default = 'bw'
 
 
 '''
-HELPERS
+|--- HELPERS ---|
 '''
 
+'''
+Returns the N relays which best represent the input dataframe
+'''
+def chooseNRelays(df, name_column=fingerprint_default, bandwidth_column=bandwidth_default):
+    pass
