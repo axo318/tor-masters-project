@@ -19,7 +19,7 @@ class Node(Debug):
         # Get milliseconds time
         initial_time = self.curTime()
 
-        while(self.curTime() < initial_time + x_time*60000):
+        while(self.curTime() < initial_time + self.x_time*60000):
             self.show('Current time is less than',initial_time)
             self.execMeasurement()
 
