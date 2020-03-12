@@ -17,9 +17,9 @@ class Main(Debug):
         # Check inputs, if not correct set default values
         if len(args) != 3:
             args = []
-            args.append('60') # x_time
-            args.append('10') # n_samples
-            args.append('5') # t_threads
+            args.append('180') # x_time
+            args.append('5') # n_samples
+            args.append('1') # t_threads
             self.show('Invalid Inputs, going to defaults')
         else:
             self.show('Inputs Valid')
@@ -28,9 +28,10 @@ class Main(Debug):
         f = open(fp_list, 'r')
         fps = [line[:-1] for line in f]
 
-        # Run
-        control = Control(args, fps, ref_node, day_cycle=DAY_CYCLE)
-        control.run()
+        # Run for 3 days
+        for i in range(3):
+            control = Control(args, fps, ref_node, day_cycle=DAY_CYCLE)
+            control.run()
 
 
 if __name__=='__main__':
