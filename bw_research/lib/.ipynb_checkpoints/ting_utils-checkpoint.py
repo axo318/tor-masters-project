@@ -2,13 +2,13 @@ import pandas as pd
 import json
 
 '''
-Object specs:
+INPUTS:
     x          : Anchor relay (always the same)
     y          : Variable relay
     time_start : timestamp
     trials     : y,x,xy,rtt objects
     
-Returns:
+RETURNS:
     DataFrame  : time, anchor, relay, rtt
 '''
 def getTingMeasurementsFromFile(file_path=''):
@@ -34,3 +34,41 @@ def getTingMeasurementsFromFile(file_path=''):
     df['rtt'] = [m['trials'][0]['rtt'] for m in objs]
     
     return df
+
+
+'''
+INPUTS:
+    signal_y        : Signal values
+    time_x          : Timestamp for measurements (seconds)
+    sampling_period : Sampling interval (seconds)
+    sampling_offset : Offset for first sample
+
+RETURNS:
+    sampled_signal  : list containing the sampled data
+'''
+def getSampledSignal(signal_y, time_x, sampling_period, sampling_offset=0):
+    # Check dimensions
+    if len(signal_y) != len(time_x):
+        print('signal_y({}) and time_x({}) do not have similar dimensions'.format(len(signal_y), len(time_x)))
+        return []
+    
+    # Initialize variables we need to keep track
+    i              = sampling_offset        # current index
+    current_sample = signal_y[i]            # current sample value
+    t              = time_x[i]              # current time
+    next_t         = t + sampling_period    # time of next sample
+    sampled_signal = [0] * sampling_offset  # list which will hold sampled data
+    
+    # Iterate through datapoints in signal_y
+    while(i < len(signal_y)):
+        t = time_x[i]
+        # If current time has passed the timeframe, update next_t, current_sample
+        if t >= next_t:
+            next_t += sampling_period
+            current_sample = signal_y[i]
+        
+        # Add current sample value to sampled_signal list, and update variables
+        sampled_signal.append(current_sample)
+        i += 1
+    
+    return sampled_signal
