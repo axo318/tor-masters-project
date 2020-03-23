@@ -1,17 +1,19 @@
 import pandas as pd
 import json
 
-'''
-INPUTS:
-    x          : Anchor relay (always the same)
-    y          : Variable relay
-    time_start : timestamp
-    trials     : y,x,xy,rtt objects
-    
-RETURNS:
-    DataFrame  : time, anchor, relay, rtt
-'''
+##
 def getTingMeasurementsFromFile(file_path=''):
+    '''
+    INPUTS:
+        x          : Anchor relay (always the same)
+        y          : Variable relay
+        time_start : timestamp
+        trials     : y,x,xy,rtt objects
+
+    RETURNS:
+        DataFrame  : time, anchor, relay, rtt
+    '''
+    
     # Check path
     if len(file_path) == 0: return None
     
@@ -36,17 +38,19 @@ def getTingMeasurementsFromFile(file_path=''):
     return df
 
 
-'''
-INPUTS:
-    signal_y        : Signal values
-    time_x          : Timestamp for measurements (seconds)
-    sampling_period : Sampling interval (seconds)
-    sampling_offset : Offset for first sample
-
-RETURNS:
-    sampled_signal  : list containing the sampled data
-'''
+##
 def getSampledSignal(signal_y, time_x, sampling_period, sampling_offset=0):
+    '''
+    INPUTS:
+        signal_y        : Signal values
+        time_x          : Timestamp for measurements (seconds)
+        sampling_period : Sampling interval (seconds)
+        sampling_offset : Offset for first sample
+
+    RETURNS:
+        sampled_signal  : list containing the sampled data
+    '''
+    
     # Check dimensions
     if len(signal_y) != len(time_x):
         print('signal_y({}) and time_x({}) do not have similar dimensions'.format(len(signal_y), len(time_x)))
@@ -72,3 +76,35 @@ def getSampledSignal(signal_y, time_x, sampling_period, sampling_offset=0):
         i += 1
     
     return sampled_signal
+
+
+##
+def getTotalVariation(x1, x2, offset=0):
+    '''
+    INPUTS:
+        x1              : 1st set of data
+        x2              : 2nd set of data
+        offset          : index from which the operation will start
+
+    RETURNS:
+        total_variation : list containing the sampled data
+    '''
+    
+    # Get rid of offsets
+    x1_ = x1[offset:]
+    x2_ = x2[offset:]
+    
+    # Check bounds
+    x1_size = len(x1_)
+    x2_size = len(x2_)
+    size = min(x1_size, x2_size)
+    
+    if(x1_size != x2_size):
+        print("Dimensions of x1({}) and x2({}) are not equal. Defaulting to size of {}".format(x1_size, x2_size, size))
+        
+    # Get absolute differences
+    total_variation = 0
+    for i in range(size):
+        total_variation += abs(x1_[i] - x2_[i])
+    
+    return total_variation
