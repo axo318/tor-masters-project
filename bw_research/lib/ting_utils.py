@@ -79,7 +79,7 @@ def getSampledSignal(signal_y, time_x, sampling_period, sampling_offset=0):
 
 
 ##
-def getTotalVariation(x1, x2, offset=0):
+def getVariation(x1, x2, offset=0):
     '''
     INPUTS:
         x1              : 1st set of data
@@ -91,12 +91,12 @@ def getTotalVariation(x1, x2, offset=0):
     '''
     
     # Get rid of offsets
-    x1_ = x1[offset:]
-    x2_ = x2[offset:]
+    x1_off = list(x1[offset:])
+    x2_off = list(x2[offset:])
     
     # Check bounds
-    x1_size = len(x1_)
-    x2_size = len(x2_)
+    x1_size = len(x1_off)
+    x2_size = len(x2_off)
     size = min(x1_size, x2_size)
     
     if(x1_size != x2_size):
@@ -105,6 +105,21 @@ def getTotalVariation(x1, x2, offset=0):
     # Get absolute differences
     total_variation = 0
     for i in range(size):
-        total_variation += abs(x1_[i] - x2_[i])
+        total_variation += abs(x1_off[i] - x2_off[i])
     
     return total_variation
+
+
+##
+def getTotalVariation(x, y, sampling_period):
+    '''
+    INPUTS:
+        x               : times associated with the data
+        y               : data
+        sampling_period : Sampling interval (seconds)
+
+    RETURNS:
+        total_variation : A mean and std of variations across different offsets
+    '''
+    
+    pass
