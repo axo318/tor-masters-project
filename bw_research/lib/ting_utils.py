@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import statistics
 
 ##
 def getTingMeasurementsFromFile(file_path=''):
@@ -13,7 +14,6 @@ def getTingMeasurementsFromFile(file_path=''):
     RETURNS:
         DataFrame  : time, anchor, relay, rtt
     '''
-    
     # Check path
     if len(file_path) == 0: return None
     
@@ -50,7 +50,6 @@ def getSampledSignal(signal_y, time_x, sampling_period, sampling_offset=0):
     RETURNS:
         sampled_signal  : list containing the sampled data
     '''
-    
     # Check dimensions
     if len(signal_y) != len(time_x):
         print('signal_y({}) and time_x({}) do not have similar dimensions'.format(len(signal_y), len(time_x)))
@@ -79,26 +78,40 @@ def getSampledSignal(signal_y, time_x, sampling_period, sampling_offset=0):
 
 
 ##
-def getVariation(x1, x2, offset=0):
+def calculateWindowInterval(times, sampling_period):
     '''
-    INPUTS:
-        x1              : 1st set of data
-        x2              : 2nd set of data
-        offset          : index from which the operation will start
+    Description:
+        Takes the times and sampling period and calculates the maximum window interval which makes the variations valid
+    '''
+    size = len(times)
+    if size < 2:
+        return None
+    
+    # First convert sampling_period(seconds) into index_period(index)
+    time_cycle = times[1] - times[0]
+    index_period = sampling_period // time_cycle     # Here we convers seconds -> indexes   Eg. 20s -> 1 index
+    
+    # The window interval then becomes (index_period : size-index_period)
+    return (index_period, size - index_period)
 
-    RETURNS:
-        total_variation : list containing the sampled data
-    '''
+
+##
+def getVariationSum(x1, x2, window_interval=None):
+    if window_interval==None:
+        m = 0
+        n = -1
+    else:
+        m = window_interval[0]
+        n = window_interval[1]
     
     # Get rid of offsets
-    x1_off = list(x1[offset:])
-    x2_off = list(x2[offset:])
+    x1_off = list(x1[m:n])
+    x2_off = list(x2[m:n])
     
     # Check bounds
     x1_size = len(x1_off)
     x2_size = len(x2_off)
     size = min(x1_size, x2_size)
-    
     if(x1_size != x2_size):
         print("Dimensions of x1({}) and x2({}) are not equal. Defaulting to size of {}".format(x1_size, x2_size, size))
         
@@ -111,15 +124,58 @@ def getVariation(x1, x2, offset=0):
 
 
 ##
-def getTotalVariation(x, y, sampling_period):
+def getSampledVariation(data, times, sampling_period, window_interval=None, sampling_offset=0):
+    '''
+    Description:
+        Takes the data, the timestamps, the sampling period(seconds) (and the valid window_interval)
+        It samples the data given the sampling period (in seconds)
+        
+    INPUTS:
+        data            : 1st set of data
+        timestamps      : 2nd set of data
+        sampling_period : Sampling interval (seconds)
+        window_interval : the range of indexes which will be measured (tuple) (m,n) m<=n
+        sampling_offset : offset for sampling method start
+
+    RETURNS:
+        variation : sum of all absolute differences between the two curves
+    '''
+    if window_interval==None:
+        m = 0
+        n = -1
+    else:
+        m = window_interval[0]
+        n = window_interval[1]
+    
+    # Sample the data
+    sampled_data = getSampledSignal(data, times, sampling_period, sampling_offset=sampling_offset)
+    return getVariationSum(sampled_data, data, window_interval=window_interval)
+
+
+##
+def getVariationDistribution(data, times, sampling_period, window_interval=None):
     '''
     INPUTS:
-        x               : times associated with the data
-        y               : data
+        data            : data
+        times           : times associated with the data
         sampling_period : Sampling interval (seconds)
 
     RETURNS:
         total_variation : A mean and std of variations across different offsets
     '''
     
-    pass
+    # Calculate window interval
+    if window_interval==None:
+        window_interval = calculateWindowInterval(times, sampling_period)
+        print('Window interval was calculated as:',window_interval)
+    
+    # Calculate how many offsets we need to apply to cover all possible combinations for this sampling period
+    # Here we assume each timing is equally spaced out
+    (max_offset,_) = calculateWindowInterval(times, sampling_period)
+    
+    # Run the "getSampledVariation" for each of the sampling offsets
+    variations = []
+    for offset in range(max_offset):
+        variations.append(getSampledVariation(data, times, sampling_period, window_interval=window_interval, sampling_offset=offset))
+    
+    return statistics.mean(variations), statistics.stdev(variations)
