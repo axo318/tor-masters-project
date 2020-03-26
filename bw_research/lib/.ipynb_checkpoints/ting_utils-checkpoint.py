@@ -33,7 +33,7 @@ def getTingMeasurementsFromFile(file_path=''):
     df['time'] = [m['time_start'] for m in objs]
     df['anchor'] = [m['x']['fp'] for m in objs]
     df['relay'] = [m['y']['fp'] for m in objs]
-    df['rtt'] = [m['trials'][0]['rtt'] for m in objs]
+    df['rtt'] = [m['trials'][0]['rtt'] if len(m['trials'])>0 else None for m in objs]
     
     return df
 

@@ -6,6 +6,13 @@ name_default = 'name'
 bandwidth_default = 'bw'
 
 
+DATE = 'date'
+TIME = 'time'
+ANCHOR = 'anchor'
+RELAY = 'relay'
+RTT ='rtt'
+
+
 
 '''
 |--- HELPERS ---|
