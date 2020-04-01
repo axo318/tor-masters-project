@@ -1,5 +1,5 @@
 import pandas as pd
-from datetime import datetime
+from .my_time import Time
 from .utils import DATE, TIME, ANCHOR, RELAY, RTT, DATETIME
 
 
@@ -60,8 +60,10 @@ class SessionMaker:
         return sessions
     
     def timePassed(self, current_time, previous_time):# Time format: "31/12/2020 23:59:59
-        cur_secs = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S').timestamp()
-        prev_secs = datetime.strptime(previous_time, '%Y-%m-%d %H:%M:%S').timestamp()
+        cur_secs = Time(current_time).toSeconds()
+        prev_secs = Time(previous_time).toSeconds()
+#         cur_secs = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S').timestamp()
+#         prev_secs = datetime.strptime(previous_time, '%Y-%m-%d %H:%M:%S').timestamp()
         return cur_secs - prev_secs > self.timeout
     
     def getRelaySessions(self, df):
