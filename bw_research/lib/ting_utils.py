@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import statistics
+import math
 
 from .my_time import Time
 from .utils import DATE, TIME, ANCHOR, RELAY, RTT, DATETIME
@@ -88,7 +89,10 @@ def getVariationDistribution(data, times, sampling_period, window_interval=None)
     for offset in range(low_index):
         variations.append(getSampledVariation(data, times, sampling_period, index_window, sampling_offset=offset))
     
+    # Returning standard deviation
     return statistics.mean(variations), statistics.stdev(variations)
+    # Returning standard error
+    #return statistics.mean(variations), statistics.stdev(variations) / math.sqrt(len(variations))
 
 
 #######################

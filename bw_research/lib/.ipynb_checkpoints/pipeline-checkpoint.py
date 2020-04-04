@@ -31,20 +31,21 @@ class Pipeline(UserMsg):
         #  -> Shorter time interval
         max_sample = max(sampling_period_list)
         short_holder = self.getShortestTimeHolder()
-        window_interval = calculateWindowInterval(short_holder.times, max_sample)
+        window_interval = 3600#calculateWindowInterval(short_holder.times, max_sample)
         self.log('Shortest time duration was found to be:',short_holder.duration,'for relay:',short_holder.relay)
         self.log('Window interval was calculated as:',window_interval,'seconds,',window_interval/60,'minutes')
         
         # Run tests
         self.log('Starting tests ...')
-        for holder in self.holders:
+        for i,holder in enumerate(self.holders):
             HolderTester(holder).runTests(window_interval)
+            self.log('Done:', (100*(i+1))//len(self.holders), "%")
         
     # Make holders
     def buildHolders(self, sampling_period_list):
         holders = []
         i = 0
-        while(i < self.file_limit):
+        while(i < self.file_limit and i < len(self.files)):
             file = self.files[i]
             holders.append(DataHolder(self.path + file, sampling_period_list))
             self.log('File:',file,'was parsed.')
@@ -64,7 +65,36 @@ class Pipeline(UserMsg):
     def printResults(self):
         for holder in self.holders:
             holder.printResults()
+            
+    ## Saves holder results in a csv file
+    def saveResults(self, file_path):
+        relays = []
+        dates  = []
+        rates  = []
+        means  = []
+        stds   = []
         
+        for h in self.holders:
+            (rs,res) = h.getResults()
+            ms = [m[0] for m in res]
+            ss = [s[1] for s in res]
+            relays.append(h.relay)
+            dates.append(h.times[0])
+            rates.append(rs)
+            means.append(ms)
+            stds.append(ss)
+        
+        df = pd.DataFrame()
+        df[RELAY] = relays
+        df[DATETIME] = dates
+        df['rates'] = rates
+        df['mean_variations'] = means
+        df['standard_devs'] = stds
+        df.to_csv(file_path, index=False)
+        
+    ## Loads holders
+    def loadCSV(self, file_path):
+        pass
     
     
 class DataHolder(UserMsg):
@@ -84,6 +114,9 @@ class DataHolder(UserMsg):
         for i,period in enumerate(self.sampling_period_list):
             print('Sampling Period (minutes):',period/60,' Variance,Std =',self.results[i])
         print()
+        
+    def getResults(self):
+        return (self.sampling_period_list, self.results)
     
     def graph(self):
         pass
